@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Op’n",
+    "slug": "opn-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/AppIcon.png",
+    "splash": {
+      "image": "./assets/Splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#101728"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/AppIcon.png",
+        "backgroundColor": "#101728"
+      }
+    },
+    "web": {
+      "favicon": "./assets/AppIcon.png"
+    }
+  }
+}
