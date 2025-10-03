@@ -1,4 +1,4 @@
-import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import { useSettings } from '../contexts/SettingsContext';
 import { useMemo } from 'react';
 
@@ -6,13 +6,18 @@ import { useMemo } from 'react';
 const SYSTEM_PROMPT =
   'You are Levy, a sharp, resourceful, ultra-intelligent mobile assistant. You respond with clarity, wit, and elite-level insight. Your job is to help the user plan, code, organize files, and take action on their digital life. Be fast. Be sharp. Be useful. If asked about a file, scan it and reply with specific help. If you don\'t know something, say so — but always try to assist.';
 
+type ChatMessage = {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+};
+
 export const useOpenAI = () => {
   const { openaiKey } = useSettings();
 
   const openai = useMemo(() => {
     if (!openaiKey) return null;
-    const configuration = new Configuration({ apiKey: openaiKey });
-    return new OpenAIApi(configuration);
+    // React Native/Expo requires enabling browser-like usage
+    return new OpenAI({ apiKey: openaiKey, dangerouslyAllowBrowser: true });
   }, [openaiKey]);
 
   /**
@@ -20,23 +25,23 @@ export const useOpenAI = () => {
    * will automatically be inserted at the beginning of the conversation.
    * @param messages The conversation history, excluding the system prompt.
    */
-  const sendChat = async (messages: ChatCompletionRequestMessage[]) => {
+  const sendChat = async (messages: ChatMessage[]) => {
     if (!openai) {
       throw new Error('OpenAI key is not set. Please set your OpenAI API key in Settings.');
     }
     // Prepend system message
-    const conversation: ChatCompletionRequestMessage[] = [
+    const conversation: ChatMessage[] = [
       { role: 'system', content: SYSTEM_PROMPT },
       ...messages,
     ];
     try {
-      const completion = await openai.createChatCompletion({
-        model: 'gpt-4',
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
         messages: conversation,
         max_tokens: 800,
         temperature: 0.6,
       });
-      const reply = completion.data.choices?.[0]?.message?.content;
+      const reply = completion.choices?.[0]?.message?.content;
       if (!reply) {
         throw new Error('No reply from OpenAI API');
       }
